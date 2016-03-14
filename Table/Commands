@@ -1,0 +1,5 @@
+#Commands
+
+- 'z,x': +/- 0.5f y_rotation
+- 'w,a,s,d': +/- 0.5f  bey translation on x,z axis
+- 'i,j,k,l': +/- 0.5f  table translation on x,z axis
