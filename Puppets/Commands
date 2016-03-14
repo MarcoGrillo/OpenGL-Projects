@@ -1,0 +1,7 @@
+#Commands
+
+- 'z,x': +/- 2.0f y_rotation
+- 'c,v': +/- 2.0f x_rotation
+- 'n':  enable/disable fog
+- 'w': add a puppet (max 12)
+- 's': delete a puppet (min 2)
