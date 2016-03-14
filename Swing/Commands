@@ -1,0 +1,6 @@
+#Commands
+
+- 'a,d': +/- y_rotation
+- 'w's': +/- x_rotation
+- 'left mouse button': activate swing motion
+- '+,-': +/- 0.0001f alpha surface factor 
