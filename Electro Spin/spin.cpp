@@ -228,7 +228,7 @@ void keyboard(unsigned char k, int x, int y) {
 		case 'a': 
 					y_rot += 1.5f;
 					break;
-		case 'd': 	y_rot -= 1.5f;
+		case 'd': 	        y_rot -= 1.5f;
 					break;
 		case 'w':
 					x_rot += 1.5f;
