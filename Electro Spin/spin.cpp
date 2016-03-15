@@ -29,7 +29,7 @@ GLfloat x_rot = 0;
 GLfloat y_rot = 0;
 
 // Coordinates x,y
-GLfloat spin_angle = 90;
+GLfloat spin_angle = 0;
 GLfloat y_center;
 
 // Radius
@@ -44,9 +44,8 @@ GLfloat p_radius;
 GLfloat rad_dist = 4;
 GLint verso = 1;
 
-// Spin
-GLfloat x_spin = cos(((270*PI)/180))*25+30;
-GLfloat y_spin = sin(((270*PI)/180))*25+30;
+// Animation bool
+bool stop_anim = false;
 
 void init() {
 	
@@ -186,7 +185,7 @@ void draw_scene() {
 		glPushMatrix();
 
 		glTranslatef(0,y_center+25,0);
-		glRotatef(85*sin(spin_angle),0,0,1);
+		glRotatef(85*sin((spin_angle*PI)/180),0,0,1);
 		glTranslatef(0,y_center-30,0);
 			glPushMatrix();
 				glTranslatef(0,1.5,0);
@@ -216,8 +215,11 @@ void draw_scene() {
 }
 
 void idle() {
-	y_disk += 5;
-	spin_angle += 0.03;
+	if(!stop_anim || (int)spin_angle%180!= 0) {
+		y_disk += 5;	
+		spin_angle += 1;
+	}
+
 	glutPostRedisplay();
 }
 
@@ -254,6 +256,9 @@ void keyboard(unsigned char k, int x, int y) {
 		case 'p':
 					if(n_people > 4)
 						n_people--;
+					break;
+		case 'b':
+					stop_anim = !stop_anim;
 					break;
 	}
 
