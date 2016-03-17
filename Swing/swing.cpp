@@ -3,9 +3,13 @@
 #include <GL/gl.h>
 #include <iostream>
 #include <cmath>
+#include <climits>
 
+#define SCENA 5
 #define CHAIN 1
+#define SEAT 3
 #define HILL 2
+#define ASTA 4
 
 #define PI 3.1415
 
@@ -86,16 +90,15 @@ void draw_scene() {
 
 	glShadeModel(GL_SMOOTH);
 	glInitNames();
-	glPushName(0);
+	glPushName(SCENA);
 
 	glPushMatrix();
-		glPushName(1);
+		glPushName(HILL);
 		glCallList(HILL);
-		glPopName();
 	glPopMatrix();
 
 	glPushMatrix();
-		glPushName(1);
+		glLoadName(CHAIN);
 		glPushMatrix();
 			glTranslatef(0,-alfa*(pow(-19,2)+pow(0,2))+46.5,0);
 			glRotatef(40*sin(angle),1,0,0);
@@ -130,6 +133,7 @@ void draw_scene() {
 			glColor3f(0.8,0.3,0);
 			// Seggiolino
 			glPushMatrix();
+				glLoadName(SEAT);
 				glTranslatef(0,-alfa*(pow(-19,2)+pow(0,2))+16,0);
 				glScalef(16,2,5);
 				glutSolidCube(1);
@@ -137,6 +141,7 @@ void draw_scene() {
 
 			glColor3f(1,0,0);
 			glPushMatrix();
+				glLoadName(SEAT);
 				glTranslatef(0,-alfa*(pow(-19,2)+pow(0,2))+17,0);
 				glRotatef(-90,1,0,0);
 				glutSolidCone(2.5,8,60,60);
@@ -146,6 +151,7 @@ void draw_scene() {
 			glColor3f(0.3,0.2,0);
 			// Asta sx
 			glPushMatrix();
+				glLoadName(ASTA);
 				glTranslatef(0,-alfa*(pow(-19,2)+pow(0,2)),0);
 				glTranslatef(-17,25,0);
 				glScalef(4,50,4);
@@ -155,6 +161,7 @@ void draw_scene() {
 			glColor3f(0.3,0.2,0);
 			// Asta dx
 			glPushMatrix();
+				glLoadName(ASTA);
 				glTranslatef(0,-alfa*(pow(-19,2)+pow(0,2)),0);
 				glTranslatef(17,25,0);
 				glScalef(4,50,4);
@@ -170,13 +177,13 @@ void draw_scene() {
 					glVertex2f(16,0);
 				glEnd();
 			glPopMatrix();
-			glPopName();
 	glPopMatrix();
 }
 
 void display() {
 	glClearColor(0,0.6,0.7,1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 		glRotatef(x_rot,1,0,0);
 		glRotatef(y_rot,0,1,0);
@@ -185,6 +192,32 @@ void display() {
 	glPopMatrix();
 
 	glutSwapBuffers();
+}
+
+void process_zObject(GLuint *selectBuffer, GLint hits) {
+	int id = 0;
+	GLuint z_min = UINT_MAX; // Sparo al massimo la z
+	GLuint id_min = INT_MIN; // Sparo al minimo l'id
+
+	for(int i=0; i<hits; i++) {
+		for(int j=id; j<=(id+2+selectBuffer[id]); j++) {
+			std::cout << selectBuffer[j] << std::endl;
+		}
+
+		std::cout << std::endl;
+		// Se il valore di z nel buffer
+		if(selectBuffer[id+1] < z_min) {
+			// Prendere il valore della z_min nel buffer
+			z_min = selectBuffer[id+1];
+			id_min = selectBuffer[id+2+selectBuffer[id]];
+		}
+
+		id += selectBuffer[id]+3;
+	}
+
+	std::cout << "Selected object: " << id_min << std::endl;
+
+	glutPostRedisplay();
 }
 
 void process_selection(int x, int y) {
@@ -219,18 +252,17 @@ void process_selection(int x, int y) {
 	display();
 
 	// Ripristino la matrice di proiezione
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glMatrixMode(GL_MODELVIEW);
 
 	// Calcolo del numero di hits
 	hits = glRenderMode(GL_RENDER);
-	std::cout << hits << std::endl;
-	if(hits >= 1)
+	if(hits >= 1) {
+		process_zObject(selectBuffer,hits);
 		anim_trigger = !anim_trigger;
+	}
 	else
 		std::cout << "Hai cliccato spazio vuoto" << std::endl;
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 }
 
 void mouse_callback(int button,int state, int x,int y) {
@@ -239,6 +271,7 @@ void mouse_callback(int button,int state, int x,int y) {
 }
 
 void idle() {
+	
 	if(anim_trigger) {
 		angle += 0.2*verso;
 	}
